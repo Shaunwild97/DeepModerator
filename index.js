@@ -25,7 +25,7 @@ client.registry
 
 'use_strict'
 
-client.login(fs.readFileSync('./token.key', 'utf-8'))
+client.login(fs.readFileSync('~/.nodekeys/deep-token.key', 'utf-8'))
     .then(() => console.log('Logged in to Discord'))
     .catch(console.error)
 
