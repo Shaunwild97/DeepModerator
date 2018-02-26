@@ -1,0 +1,1 @@
+ssh -A -t DeepModerator sh DeepModerator/update.sh
