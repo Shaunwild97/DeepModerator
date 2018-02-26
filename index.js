@@ -9,6 +9,19 @@ const winston = require('winston')
 
 winston.level = 'debug'
 
+const winston_options = {
+    json: true,
+    timestamp: true,
+    stringify: (obj) => JSON.stringify(obj),
+}
+
+const logger = new (winston.Logger)({
+    transports: [
+        new winston.transports.Console(winston_options),
+        new winston.transports.File(winston_options)
+    ]
+})
+
 const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
 const client = new Commando.Client({
@@ -33,8 +46,9 @@ client.login(fs.readFileSync(require('os').homedir() + '/.nodekeys/deep-token.ke
     .catch(console.error)
 
 client
-    .on('error', console.error)
-    .on('warn', console.warn)
+    .on('error', logger.error)
+    .on('warn', logger.warn)
+    .on('guildCreate', handleGuildJoin)
     .on('message', handleMessage)
     .on('messageUpdate', (oldMessage, newMessage) => {
         handleMessage(newMessage)
@@ -90,6 +104,10 @@ function moderateImage(message, url) {
     DeepUtil.requestImageBuffer(url)
         .then(buffer => handleImageModeration(buffer, message))
         .catch(console.error)
+}
+
+function handleGuildJoin(guild){
+    logger.info(`Joined guild ${guild.name} (${guild.id})`)
 }
 
 function handleImageModeration(blob, message) {
