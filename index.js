@@ -123,7 +123,7 @@ function handleImageModeration(blob, message) {
         Image: {
             Bytes: blob
         },
-        MinConfidence: 0.7
+        MinConfidence: 0.6
     }
 
     rekognition.detectModerationLabels(params, (err, data) => {
