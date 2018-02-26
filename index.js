@@ -5,6 +5,9 @@ const fs = require('fs')
 const AWS = require('aws-sdk')
 const DeepUtil = require('./app/deeputil')
 const uuid = require('uuid')
+const winston = require('winston')
+
+winston.level = 'debug'
 
 const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
