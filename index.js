@@ -4,6 +4,7 @@ const Commando = require('discord.js-commando')
 const fs = require('fs')
 const AWS = require('aws-sdk')
 const DeepUtil = require('./app/deeputil')
+const DeepStrings = require('./app/deepstrings')
 const uuid = require('uuid')
 const winston = require('winston')
 
@@ -109,6 +110,12 @@ function moderateImage(message, url) {
 
 function handleGuildJoin(guild){
     logger.info(`Joined guild ${guild.name} (${guild.id})`)
+
+    const welcomeChannel = findSuitableReportingChannel(guild)
+
+    if(welcomeChannel) {
+        welcomeChannel.send(DeepStrings.welcome)
+    }
 }
 
 function handleImageModeration(blob, message) {
@@ -152,6 +159,26 @@ function handleImageModeration(blob, message) {
             }
         }
     })
+}
+
+function findSuitableReportingChannel(server) {
+    const suitableChannels = ['bot_channel', 'bot_chat', 'bot', 'general']
+
+    let backupChannel
+
+    for (let suitable in suitableChannels) {
+        for (let channel of server.channels.values()) {
+            if (suitable === channel.name) {
+                return channel
+            }
+
+            if (channel.name.includes('bot')) {
+                backupChannel = channel
+            }
+        }
+
+        return (backupChannel ? backupChannel : server.channels[0])
+    }
 }
 
 function gatherContent(data) {
