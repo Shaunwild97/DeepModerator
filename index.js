@@ -1,3 +1,5 @@
+'use_strict'
+
 const Commando = require('discord.js-commando')
 const fs = require('fs')
 const AWS = require('aws-sdk')
@@ -22,8 +24,6 @@ client.registry
         ['admin', 'Admin Commands']
     ])
     .registerDefaults()
-
-'use_strict'
 
 client.login(fs.readFileSync(require('os').homedir() + '/.nodekeys/deep-token.key', 'utf-8'))
     .then(() => console.log('Logged in to Discord'))
