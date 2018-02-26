@@ -13,6 +13,7 @@ const winston_options = {
     json: true,
     timestamp: true,
     stringify: (obj) => JSON.stringify(obj),
+    filename: 'deepmod.log'
 }
 
 const logger = new (winston.Logger)({
