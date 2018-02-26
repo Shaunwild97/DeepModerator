@@ -43,8 +43,8 @@ client.registry
     .registerDefaults()
 
 client.login(fs.readFileSync(require('os').homedir() + '/.nodekeys/deep-token.key', 'utf-8'))
-    .then(() => console.log('Logged in to Discord'))
-    .catch(console.error)
+    .then(() => logger.info('Logged in to Discord'))
+    .catch(logger.error)
 
 client
     .on('error', logger.error)
@@ -104,7 +104,7 @@ function handleAttachments(message) {
 function moderateImage(message, url) {
     DeepUtil.requestImageBuffer(url)
         .then(buffer => handleImageModeration(buffer, message))
-        .catch(console.error)
+        .catch(logger.error)
 }
 
 function handleGuildJoin(guild){
@@ -121,7 +121,7 @@ function handleImageModeration(blob, message) {
 
     rekognition.detectModerationLabels(params, (err, data) => {
         if (err) {
-            console.error(err)
+            logger.error(err)
         } else {
             if (data.ModerationLabels.length) {
                 const content = gatherContent(data)
@@ -138,11 +138,11 @@ function handleImageModeration(blob, message) {
 
     rekognition.detectText(params, (err, data) => {
         if (err) {
-            console.error(err)
+            logger.error(err)
         } else {
             if (data.TextDetections.length) {
                 for (let text of data.TextDetections) {
-                    console.log(text.DetectedText)
+                    logger.debug(text.DetectedText)
 
                     if (DeepUtil.textContainsSwear(text.DetectedText)) {
                         removeNSFWMessage(message, `**<@!${message.author.id}>, Bad language was detected in your image.**`)
