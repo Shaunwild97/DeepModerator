@@ -42,10 +42,10 @@ module.exports = {
     },
 
     isSwearWord(word){
-        return binarySearch(badwords, word) > -1
+        return binarySearch(badwords, word.toLowerCase()) > -1
     },
 
     channelNeedsModeration(channel){
-        return !(channel.nsfw || channel.name.includes('nsfw'))
+        return !(channel.type === 'dm' || channel.nsfw || channel.name.includes('nsfw'))
     }
 }
