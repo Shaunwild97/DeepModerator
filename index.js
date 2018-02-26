@@ -51,6 +51,7 @@ client
     .on('error', logger.error)
     .on('warn', logger.warn)
     .on('guildCreate', handleGuildJoin)
+    .on('guildDelete', handleGuildRemove)
     .on('message', handleMessage)
     .on('messageUpdate', (oldMessage, newMessage) => {
         handleMessage(newMessage)
@@ -116,6 +117,10 @@ function handleGuildJoin(guild){
     if(welcomeChannel) {
         welcomeChannel.send(DeepStrings.welcome)
     }
+}
+
+function handleGuildRemove(guild){
+    logger.info(`Removed from guild ${guild.name} (${guild.id})`)
 }
 
 function handleImageModeration(blob, message) {
