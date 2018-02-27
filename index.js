@@ -6,23 +6,9 @@ const AWS = require('aws-sdk')
 const DeepUtil = require('./app/deeputil')
 const DeepStrings = require('./app/deepstrings')
 const uuid = require('uuid')
-const winston = require('winston')
-
-winston.level = 'debug'
-
-const winston_options = {
-    json: true,
-    timestamp: true,
-    stringify: (obj) => JSON.stringify(obj),
-    filename: 'deepmod.log'
-}
-
-const logger = new (winston.Logger)({
-    transports: [
-        new winston.transports.Console(winston_options),
-        new winston.transports.File(winston_options)
-    ]
-})
+const DeepDB = require('./app/deepdb')
+const logger = require('./app/deeplogger')
+const path = require('path')
 
 const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
@@ -37,11 +23,20 @@ AWS.config.update({ region: 'eu-west-1' })
 
 const rekognition = new AWS.Rekognition()
 
+const config = new DeepDB()
+
+module.exports = {
+    config,
+}
+
 client.registry
+    .registerDefaultTypes()
     .registerGroups([
         ['admin', 'Admin Commands']
     ])
-    .registerDefaults()
+    .registerDefaultGroups()
+    .registerDefaultCommands()
+    .registerCommandsIn(path.join(__dirname, 'app/commands'));
 
 client.login(fs.readFileSync(require('os').homedir() + '/.nodekeys/deep-token.key', 'utf-8'))
     .then(() => logger.info('Logged in to Discord'))
@@ -63,12 +58,19 @@ function handleMessage(message) {
     }
 
     if (DeepUtil.channelNeedsModeration(message.channel)) {
-        if (DeepUtil.textContainsSwear(message.content)) {
-            removeNSFWMessage(message, `**<@!${message.author.id}>, watch your language!**`)
+
+        const serverConfig = config.getServerConfig(message.guild.id)
+
+        if(serverConfig.swearFilter){
+            if (DeepUtil.textContainsSwear(message.content)) {
+                removeNSFWMessage(message, `**<@!${message.author.id}>, watch your language!**`)
+            }
         }
 
-        if (message.attachments.size) {
-            handleAttachments(message)
+        if(serverConfig.filterImages) {
+            if (message.attachments.size) {
+                handleAttachments(message)
+            }
         }
 
         handleUrlImages(message)
