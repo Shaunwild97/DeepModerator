@@ -14,7 +14,7 @@ const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
 const client = new Commando.Client({
     owner: '90589366191136768',
-    commandPrefix: '-'
+    commandPrefix: 'dm?'
 })
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: 'bot' })
@@ -59,26 +59,28 @@ function handleMessage(message) {
 
     if (DeepUtil.channelNeedsModeration(message.channel)) {
 
-        const serverConfig = config.getServerConfig(message.guild.id)
+        config.getServerConfig(message.guild.id)
+            .then(serverConfig => {
+                if (serverConfig.swearFilter) {
+                    if (DeepUtil.textContainsSwear(message.content)) {
+                        removeNSFWMessage(message, `**<@!${message.author.id}>, watch your language!**`)
+                    }
+                }
 
-        if(serverConfig.swearFilter){
-            if (DeepUtil.textContainsSwear(message.content)) {
-                removeNSFWMessage(message, `**<@!${message.author.id}>, watch your language!**`)
-            }
-        }
+                if (serverConfig.filterImages) {
+                    if (message.attachments.size) {
+                        handleAttachments(message)
+                    }
 
-        if(serverConfig.filterImages) {
-            if (message.attachments.size) {
-                handleAttachments(message)
-            }
-        }
-
-        handleUrlImages(message)
+                    handleUrlImages(message)
+                }
+            })
     }
 }
 
 function removeNSFWMessage(message, reason) {
     message.delete()
+        .catch(logger.debug)
     message.channel.send(reason)
 }
 
@@ -111,17 +113,17 @@ function moderateImage(message, url) {
         .catch(logger.error)
 }
 
-function handleGuildJoin(guild){
+function handleGuildJoin(guild) {
     logger.info(`Joined guild ${guild.name} (${guild.id})`)
 
     const welcomeChannel = findSuitableReportingChannel(guild)
 
-    if(welcomeChannel) {
+    if (welcomeChannel) {
         welcomeChannel.send(DeepStrings.welcome)
     }
 }
 
-function handleGuildRemove(guild){
+function handleGuildRemove(guild) {
     logger.info(`Removed from guild ${guild.name} (${guild.id})`)
 }
 
@@ -173,7 +175,7 @@ function findSuitableReportingChannel(server) {
 
     let backupChannel
 
-    for (let suitable in suitableChannels) {
+    for (let suitable of suitableChannels) {
         for (let channel of server.channels.values()) {
             if (suitable === channel.name) {
                 return channel

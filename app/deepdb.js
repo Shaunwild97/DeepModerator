@@ -27,15 +27,17 @@ module.exports = class {
         let result = this._cachedServers[id]
 
         if (result) {
-            logger.debug('from cache: ' + result)
+            logger.debug('from cache: ' + JSON.stringify(result))
             return result
         }
-        result = await this._pool.query('SELECT data FROM config WHERE server_id=$1', [id]).rows
+        result = await this._pool.query("SELECT * FROM config WHERE server_id=$1", [id])
 
-        if (result) {
-            result = result[0].data
+        if (result.rowCount) {
+            result = result.rows[0]
 
-            logger.debug('from db: ' + result)
+            logger.debug(`Loaded server config from database (${id})`)
+
+            result = JSON.parse(result.data)
 
             this._cachedServers[id] = result
             return result
@@ -45,7 +47,7 @@ module.exports = class {
         this._pool.query('INSERT INTO config (server_id, data) VALUES ($1, $2)', [id, JSON.stringify(result)])
         this._cachedServers[id] = result
 
-        logger.debug('created config: ' + result)
+        logger.debug('created config: ' + JSON.stringify(this._cachedServers))
 
         return result
     }
@@ -58,11 +60,12 @@ module.exports = class {
         }
     }
 
-    updateServerConfig(id, callback) {
-        const config = this.getServerConfig(id)
+    async updateServerConfig(id, callback) {
+        const config = await this.getServerConfig(id)
 
         callback(config)
 
+        this._cachedServers[id] = config
         this.saveConfig(id, JSON.stringify(config))
     }
 

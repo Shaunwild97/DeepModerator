@@ -1,7 +1,5 @@
 const winston = require('winston')
 
-winston.level = 'debug'
-
 const winston_options = {
     json: true,
     timestamp: true,
@@ -15,5 +13,14 @@ const logger = new (winston.Logger)({
         new winston.transports.File(Object.assign(winston_options, {level: 'info'}))
     ]
 })
+
+winston.level = getLoggingLevel()
+
+function getLoggingLevel(){
+    const level = (process.env.DEEP_LOGGING ? process.env.DEEP_LOGGING : 'info')
+    logger.info(`logging at level ${level}`)
+
+    return level
+}
 
 module.exports = logger
