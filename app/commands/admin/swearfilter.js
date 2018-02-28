@@ -5,11 +5,11 @@ const logger = require('../../deeplogger')
 module.exports = class ToggleFilter extends Command {
     constructor(client) {
         super(client, {
-            name: 'togglefilter',
+            name: 'swearfilter',
             group: 'admin',
-            memberName: 'togglefilter',
+            memberName: 'swearfilter',
             description: 'Sets the state of the swear filter or displays the current swear filter state',
-            examples: ['toggleFilter <on|off>'],
+            examples: ['swearfilter <on|off>'],
             args: [{
                 key: 'state',
                 prompt: 'on or off',
@@ -28,10 +28,15 @@ module.exports = class ToggleFilter extends Command {
         if (state) {
             logger.debug(state)
             config.updateServerConfig(guildId, guildConfig => {
+                logger.debug('cache in command: ' + JSON.stringify(guildConfig))
                 guildConfig.swearFilter = (state === 'on')
+                message.reply(`Swear filter has been turned ${state}`)
             })
         } else {
-            message.reply('Currently the swear filter is ' + (config.getServerConfig(guildId).swearFilter ? 'on' : 'off'))
+            config.getServerConfig(guildId)
+                .then(config => {
+                    message.reply('Currently the swear filter is ' + (config.swearFilter ? 'on' : 'off'))
+                })
         }
     }
 }
