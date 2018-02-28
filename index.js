@@ -14,7 +14,7 @@ const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
 const client = new Commando.Client({
     owner: '90589366191136768',
-    commandPrefix: '-'
+    commandPrefix: 'dm?'
 })
 
 const credentials = new AWS.SharedIniFileCredentials({ profile: 'bot' })
@@ -175,7 +175,7 @@ function findSuitableReportingChannel(server) {
 
     let backupChannel
 
-    for (let suitable in suitableChannels) {
+    for (let suitable of suitableChannels) {
         for (let channel of server.channels.values()) {
             if (suitable === channel.name) {
                 return channel
