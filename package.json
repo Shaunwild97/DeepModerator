@@ -1,0 +1,6 @@
+{
+    "name": "DeepModerator",
+    "jest": {
+      "verbose": true
+    }
+}

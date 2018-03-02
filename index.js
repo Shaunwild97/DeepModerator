@@ -116,7 +116,7 @@ function moderateImage(message, url) {
 function handleGuildJoin(guild) {
     logger.info(`Joined guild ${guild.name} (${guild.id})`)
 
-    const welcomeChannel = findSuitableReportingChannel(guild)
+    const welcomeChannel = DeepUtil.findSuitableReportingChannel(guild)
 
     if (welcomeChannel) {
         welcomeChannel.send(DeepStrings.welcome)
@@ -168,26 +168,6 @@ function handleImageModeration(blob, message) {
             }
         }
     })
-}
-
-function findSuitableReportingChannel(server) {
-    const suitableChannels = ['bot_channel', 'bot_chat', 'bot', 'general']
-
-    let backupChannel
-
-    for (let suitable of suitableChannels) {
-        for (let channel of server.channels.values()) {
-            if (suitable === channel.name) {
-                return channel
-            }
-
-            if (channel.name.includes('bot')) {
-                backupChannel = channel
-            }
-        }
-
-        return (backupChannel ? backupChannel : server.channels[0])
-    }
 }
 
 function gatherContent(data) {

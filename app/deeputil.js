@@ -47,5 +47,25 @@ module.exports = {
 
     channelNeedsModeration(channel){
         return !(channel.type === 'dm' || channel.nsfw || channel.name.includes('nsfw'))
+    },
+
+    findSuitableReportingChannel(server) {
+        const suitableChannels = ['bot_channel', 'bot_chat', 'bot', 'general']
+    
+        let backupChannel
+    
+        for (let suitable of suitableChannels) {
+            for (let channel of server.channels.values()) {
+                if (suitable === channel.name) {
+                    return channel
+                }
+    
+                if (channel.name.includes('bot')) {
+                    backupChannel = channel
+                }
+            }
+        }
+
+        return (backupChannel ? backupChannel : server.channels.first())
     }
 }
