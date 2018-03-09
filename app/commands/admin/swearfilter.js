@@ -27,13 +27,13 @@ module.exports = class ToggleFilter extends Command {
 
         if (state) {
             logger.debug(state)
-            config.updateServerConfig(guildId, guildConfig => {
+            config.updateServerConfig(message.guild, guildConfig => {
                 logger.debug('cache in command: ' + JSON.stringify(guildConfig))
                 guildConfig.swearFilter = (state === 'on')
                 message.reply(`Swear filter has been turned ${state}`)
             })
         } else {
-            config.getServerConfig(guildId)
+            config.getServerConfig(message.guild)
                 .then(config => {
                     message.reply('Currently the swear filter is ' + (config.swearFilter ? 'on' : 'off'))
                 })

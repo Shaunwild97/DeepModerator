@@ -23,50 +23,61 @@ module.exports = class {
             .catch(logger.error)
     }
 
-    async getServerConfig(id) {
-        let result = this._cachedServers[id]
+    async getServerConfig(guild) {
+        let result = this._cachedServers[guild.id]
 
         if (result) {
             logger.debug('from cache: ' + JSON.stringify(result))
             return result
         }
-        result = await this._pool.query("SELECT * FROM config WHERE server_id=$1", [id])
+
+        result = await this._pool.query("SELECT * FROM config WHERE server_id=$1", [guild.id])
 
         if (result.rowCount) {
             result = result.rows[0]
 
-            logger.debug(`Loaded server config from database (${id})`)
+            logger.debug(`Loaded server config from database (${guild.id})`)
 
             result = JSON.parse(result.data)
 
-            this._cachedServers[id] = result
+            this._cachedServers[guild.id] = result
             return result
         }
 
-        result = this.generateDefaultConfig()
-        this._pool.query('INSERT INTO config (server_id, data) VALUES ($1, $2)', [id, JSON.stringify(result)])
-        this._cachedServers[id] = result
+        result = this.generateDefaultConfig(guild)
+        this._pool.query('INSERT INTO config (server_id, data) VALUES ($1, $2)', [guild.id, JSON.stringify(result)])
+        this._cachedServers[guild.id] = result
 
         logger.debug('created config: ' + JSON.stringify(this._cachedServers))
 
         return result
     }
 
-    generateDefaultConfig() {
+    generateDefaultConfig(guild) {
         return {
+            serverName: guild.name,
             swearFilter: false,
             swearLevel: 0,
-            filterImages: true
+            filterImages: true,
+            joined: new Date(),
+            lastUpdated: new Date()
         }
     }
 
-    async updateServerConfig(id, callback) {
-        const config = await this.getServerConfig(id)
+    async updateServerConfig(guild, callback) {
+        const config = await this.getServerConfig(guild)
 
         callback(config)
 
-        this._cachedServers[id] = config
-        this.saveConfig(id, JSON.stringify(config))
+        this.updateEssentials(config, guild)
+
+        this._cachedServers[guild.id] = config
+        this.saveConfig(guild.id, JSON.stringify(config))
+    }
+
+    updateEssentials(config, guild){
+        config.serverName = guild.name
+        config.lastUpdated = new Date()
     }
 
     saveConfig(id, config){

@@ -57,9 +57,13 @@ function handleMessage(message) {
         return
     }
 
+    if(message.content.substring(0, 3) === 'dm?'){
+        return
+    }
+
     if (DeepUtil.channelNeedsModeration(message.channel)) {
 
-        config.getServerConfig(message.guild.id)
+        config.getServerConfig(message.guild)
             .then(serverConfig => {
                 if (serverConfig.swearFilter) {
                     if (DeepUtil.textContainsSwear(message.content)) {
