@@ -166,6 +166,11 @@ function handleImageModeration(blob, message) {
 
                     if (DeepUtil.textContainsSwear(text.DetectedText)) {
                         removeNSFWMessage(message, `**<@!${message.author.id}>, Bad language was detected in your image.**`)
+
+                        config.updateServerConfig(message.guild, config => {
+                            config.imageFilterCount++
+                        })
+
                         return
                     }
                 }

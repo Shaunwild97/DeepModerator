@@ -61,28 +61,33 @@ module.exports = class {
             filterImages: true,
             joined: new Date(),
             lastUpdated: new Date(),
-            memberCount: guild.memberCount
+            memberCount: guild.memberCount,
+            imageFilterCount: 0
         }
     }
 
     async updateServerConfig(guild, callback) {
         const config = await this.getServerConfig(guild)
 
-        callback(config)
-
         this.updateEssentials(config, guild)
+
+        callback(config)
 
         this._cachedServers[guild.id] = config
         this.saveConfig(guild.id, JSON.stringify(config))
     }
 
-    updateEssentials(config, guild){
+    updateEssentials(config, guild) {
         config.serverName = guild.name
         config.lastUpdated = new Date()
         config.memberCount = guild.memberCount
+
+        if (!config.imageFilterCount) {
+            config.imageFilterCount = 0
+        }
     }
 
-    saveConfig(id, config){
+    saveConfig(id, config) {
         this._pool.query('UPDATE config SET data = $1 WHERE server_id = $2', [config, id])
     }
 }
