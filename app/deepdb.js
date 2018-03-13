@@ -60,7 +60,8 @@ module.exports = class {
             swearLevel: 0,
             filterImages: true,
             joined: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            memberCount: guild.memberCount
         }
     }
 
@@ -78,6 +79,7 @@ module.exports = class {
     updateEssentials(config, guild){
         config.serverName = guild.name
         config.lastUpdated = new Date()
+        config.memberCount = guild.memberCount
     }
 
     saveConfig(id, config){
