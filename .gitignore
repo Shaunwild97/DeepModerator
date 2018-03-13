@@ -1,3 +1,5 @@
 token.key
 postgres-credentials.key
 *.log
+
+node_modules/
