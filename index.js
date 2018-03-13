@@ -12,6 +12,8 @@ const path = require('path')
 
 const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg))/i
 
+const MAX_FILTERED_IMAGES = 250
+
 const client = new Commando.Client({
     owner: '90589366191136768',
     commandPrefix: 'dm?'
@@ -166,15 +168,18 @@ function handleImageModeration(blob, message) {
 
                     if (DeepUtil.textContainsSwear(text.DetectedText)) {
                         removeNSFWMessage(message, `**<@!${message.author.id}>, Bad language was detected in your image.**`)
-
-                        config.updateServerConfig(message.guild, config => {
-                            config.imageFilterCount++
-                        })
-
                         return
                     }
                 }
             }
+        }
+    })
+
+    config.updateServerConfig(message.guild, config => {
+        config.imageFilterCount++
+
+        if(config.imageFilterCount > MAX_FILTERED_IMAGES){
+            config.filterImages = false
         }
     })
 }
