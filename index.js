@@ -29,6 +29,7 @@ const config = new DeepDB()
 
 module.exports = {
     config,
+    handleMessage
 }
 
 client.registry
