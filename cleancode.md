@@ -1,6 +1,6 @@
 # Clean Code
 
-void large blocks of code! if a method contains more than 10 lines or servers more than one purpose, maybe look into refactoring it!
+Avoid large blocks of code! if a method contains more than 10 lines or servers more than one purpose, maybe look into refactoring it!
 
 ```js
 const PREFIX = '!'
