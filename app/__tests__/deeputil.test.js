@@ -64,3 +64,9 @@ test('findSuitableReportingChannel works with random bot channel', () => {
 
     expect(DeepUtil.findSuitableReportingChannel(mockServer)).toBe(expectedChannel)
 })
+
+test('textContainsSwear works as intended', () => {
+    const badText = 'God damn'
+    
+    expect(DeepUtil.textContainsSwear(badText)).toBe(true)
+})

@@ -29,7 +29,12 @@ const config = new DeepDB()
 
 module.exports = {
     config,
-    handleMessage
+    handleMessage,
+    handleImageModeration,
+    removeDuplicates,
+    handleGuildJoin,
+    handleGuildRemove,
+    moderateImage
 }
 
 client.registry
@@ -57,16 +62,15 @@ client
 
 function handleMessage(message) {
     if (message.author.bot) {
-        return
+        return false
     }
 
-    if(message.content.substring(0, 3) === 'dm?'){
-        return
+    if (message.content.substring(0, 3) === 'dm?') {
+        return false
     }
 
     if (DeepUtil.channelNeedsModeration(message.channel)) {
-
-        config.getServerConfig(message.guild)
+        return config.getServerConfig(message.guild)
             .then(serverConfig => {
                 if (serverConfig.swearFilter) {
                     if (DeepUtil.textContainsSwear(message.content)) {
@@ -108,6 +112,8 @@ function handleAttachments(message) {
         const filename = attachment.filename
         const isImage = DeepUtil.isImage(filename)
 
+        console.log(isImage)
+
         if (isImage) {
             moderateImage(message, attachment.url)
         }
@@ -115,7 +121,7 @@ function handleAttachments(message) {
 }
 
 function moderateImage(message, url) {
-    DeepUtil.requestImageBuffer(url)
+    return DeepUtil.requestImageBuffer(url)
         .then(buffer => handleImageModeration(buffer, message))
         .catch(logger.error)
 }
@@ -179,7 +185,7 @@ function handleImageModeration(blob, message) {
     config.updateServerConfig(message.guild, config => {
         config.imageFilterCount++
 
-        if(config.imageFilterCount > MAX_FILTERED_IMAGES){
+        if (config.imageFilterCount >= MAX_FILTERED_IMAGES) {
             config.filterImages = false
         }
     })
