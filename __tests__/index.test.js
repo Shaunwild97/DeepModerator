@@ -269,3 +269,48 @@ test('handleJoinGuild sends message to welcome channel', async () => {
 
     expect(expectedChannel.send).toHaveBeenCalled()
 })
+
+test('hitting max filtered images send message', async () => {
+    jest.resetModules()
+
+    const attachments = new Collection()
+
+    const badAttachment = {
+        filename: 'bad_image.png',
+        url: 'http://bad_image.com/bad_image.png'
+    }
+
+    attachments.set('222', badAttachment)
+
+    const channels = new Collection()
+
+    const expectedChannel = {
+        name: 'general',
+        send: jest.fn()
+    }
+
+    channels.set('222', expectedChannel)
+
+    const mockMessage = {
+        delete: jest.fn(() => Promise.resolve({})),
+        attachments,
+        content: '',
+        author: {
+            id: 12345,
+            bot: false
+        },
+        channel: {
+            type: "text",
+            name: "general",
+            send: jest.fn(() => Promise.resolve({})),
+        },
+        guild: {
+            id: 249,
+            channels
+        }
+    }
+
+    await index.handleMessage(mockMessage)
+
+    expect(expectedChannel.send).toHaveBeenCalled()
+})

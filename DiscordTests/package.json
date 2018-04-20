@@ -1,0 +1,11 @@
+{
+  "name": "DiscordTests",
+  "version": "1.0",
+  "main": "index.js",
+  "author": "Shaun",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "node index.js"
+  }
+}

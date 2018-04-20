@@ -1,4 +1,4 @@
-# Deep Moderator 
+# Deep Moderator (discontinued)
 
 The Deep Moderator uses <a href="https://aws.amazon.com/rekognition/">Amazon's Rekognition API</a> to help moderate channels.
 

@@ -112,8 +112,6 @@ function handleAttachments(message) {
         const filename = attachment.filename
         const isImage = DeepUtil.isImage(filename)
 
-        console.log(isImage)
-
         if (isImage) {
             moderateImage(message, attachment.url)
         }
@@ -185,8 +183,14 @@ function handleImageModeration(blob, message) {
     config.updateServerConfig(message.guild, config => {
         config.imageFilterCount++
 
-        if (config.imageFilterCount >= MAX_FILTERED_IMAGES) {
+        console.log(config.imageFilterCount)
+
+        if (config.imageFilterCount == MAX_FILTERED_IMAGES) {
             config.filterImages = false
+
+            const channel = DeepUtil.findSuitableReportingChannel(message.guild)
+            channel.send(DeepStrings.max_images_filtered)
+                .catch(logger.error)
         }
     })
 }

@@ -4,7 +4,6 @@ module.exports = {
         const res = {
             statusCode: 200
         }
-        console.log(url)
         const body = url
         callback(null, res, body)
     }
